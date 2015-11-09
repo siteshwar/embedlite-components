@@ -28,7 +28,7 @@ let DownloadListener = {
                                      JSON.stringify(
                                          {
                                              msg: "dl-start",
-                                             id: dl.id,
+                                             id: dl.guid,
                                              displayName: dl.displayName,
                                              state: dl.state,
                                              sourceUrl: dl.source.spec,
@@ -38,17 +38,17 @@ let DownloadListener = {
                                          }));
         break;
       case "dl-cancel":
-        Services.obs.notifyObservers(null, "embed:download", JSON.stringify({msg: "dl-cancel", id: dl.id, state: dl.state}));
+        Services.obs.notifyObservers(null, "embed:download", JSON.stringify({msg: "dl-cancel", id: dl.guid, state: dl.state}));
         break;
       case "dl-fail":
-        Services.obs.notifyObservers(null, "embed:download", JSON.stringify({msg: "dl-fail", id: dl.id, state: dl.state}));
+        Services.obs.notifyObservers(null, "embed:download", JSON.stringify({msg: "dl-fail", id: dl.guid, state: dl.state}));
         break;
       case "dl-done":
         Services.obs.notifyObservers(null, "embed:download",
                                      JSON.stringify(
                                          {
                                              msg: "dl-done",
-                                             id: dl.id,
+                                             id: dl.guid,
                                              state: dl.state,
                                              targetPath: dl.targetFile.path
                                          }));
@@ -77,7 +77,7 @@ let DownloadUIListener = {
             var downloadsData = [];
             while (statement.executeStep()) {
               let dl = Services.downloads.getDownload(statement.row.id);
-              downloadsData.push({ id: dl.id, from: dl.source.spec, to: dl.targetFile.path, state: dl.state, cur: dl.amountTransferred, max: dl.size, percent: dl.percentComplete });
+              downloadsData.push({ id: dl.guid, from: dl.source.spec, to: dl.targetFile.path, state: dl.state, cur: dl.amountTransferred, max: dl.size, percent: dl.percentComplete });
             }
             Services.obs.notifyObservers(null, "embed:download", JSON.stringify({msg: "dl-list", list: downloadsData}));
             break;
@@ -163,19 +163,19 @@ DownloadProgressListener.prototype = {
   },
 
   onProgressChange: function dPL_onProgressChange(aWebProgress, aRequest, aCurSelfProgress, aMaxSelfProgress, aCurTotalProgress, aMaxTotalProgress, aDownload) {
-    Services.obs.notifyObservers(null, "embed:download", JSON.stringify({msg: "dl-progress", id: aDownload.id, cur: aCurTotalProgress, max: aMaxTotalProgress, percent: aDownload.percentComplete, state: aDownload.state, speed: aDownload.speed}));
+    Services.obs.notifyObservers(null, "embed:download", JSON.stringify({msg: "dl-progress", id: aDownload.guid, cur: aCurTotalProgress, max: aMaxTotalProgress, percent: aDownload.percentComplete, state: aDownload.state, speed: aDownload.speed}));
   },
   onStateChange: function(aWebProgress, aRequest, aState, aStatus, aDownload)
   {
-    Services.obs.notifyObservers(null, "embed:download", JSON.stringify({msg: "dl-state", id: aDownload.id, state: aDownload.state}));
+    Services.obs.notifyObservers(null, "embed:download", JSON.stringify({msg: "dl-state", id: aDownload.guid, state: aDownload.state}));
   },
   onSecurityChange: function(aWebProgress, aRequest, aState, aDownload)
   {
-    Services.obs.notifyObservers(null, "embed:download", JSON.stringify({msg: "dl-security", id: aDownload.id, state: aDownload.state}));
+    Services.obs.notifyObservers(null, "embed:download", JSON.stringify({msg: "dl-security", id: aDownload.guid, state: aDownload.state}));
   },
   onDownloadStateChange: function(aState, aDownload)
   {
-    Services.obs.notifyObservers(null, "embed:download", JSON.stringify({msg: "dl-state", id: aDownload.id, state: aDownload.state}));
+    Services.obs.notifyObservers(null, "embed:download", JSON.stringify({msg: "dl-state", id: aDownload.guid, state: aDownload.state}));
   },
 
   //////////////////////////////////////////////////////////////////////////////
